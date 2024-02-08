@@ -1,1 +1,20 @@
 
+#######jenkin environment variable
+
+pipeline {
+
+  agent  any 
+
+
+environment {
+    anything = Credential('name u given in secret text as id ')
+}
+
+stage ('hello'){
+    step {
+        sh 'echo this is my github token $anything'
+
+    }
+}
+
+}
