@@ -1,0 +1,40 @@
+name: Fossil-creek CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency: 
+  group: build-${{ github.event.push.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - name: 🪧 Pulling Latest Code On Server
+      uses: actions/checkout@v3
+    - name: 🔘 Selecting Node Version to Build
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: 📁 Deploying environment variable
+      run: touch production.env  development.env
+    - name: ♨️copy files
+      run: |
+         echo "${{ secrets.PROD_ENV }}" > production.env 
+         echo "${{ secrets.DEV_ENV }}" > development.env 
+    - name: 🏫 Install node packagess
+      run: npm install --force
+    - name: 🔃 Restarting Projects
+      run: pm2 restart fossil-creek
+           
